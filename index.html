@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CareFlow · Rotina de Cuidados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --green:      #0D5C47;
+  --green-mid:  #1A7A60;
+  --green-lt:   #E8F5F0;
+  --green-line: #A8D5C5;
+  --cream:      #F8FAF9;
+  --white:      #FFFFFF;
+  --slate:      #2E4A42;
+  --muted:      #607B72;
+  --border:     #D4E6DF;
+  --text:       #1A2E28;
+
+  --manha:      #1A7A60;
+  --manha-lt:   #E0F4EE;
+  --tarde:      #B45309;
+  --tarde-lt:   #FEF3C7;
+  --noite:      #374151;
+  --noite-lt:   #F1F5F9;
+
+  --tec:        #166534;
+  --tec-bg:     #DCFCE7;
+  --enf:        #1E40AF;
+  --enf-bg:     #DBEAFE;
+  --pac:        #92400E;
+  --pac-bg:     #FEF3C7;
+  --urg:        #991B1B;
+  --urg-bg:     #FEE2E2;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--green);
+  color: #fff;
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute;
+  right: -60px; top: -60px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  pointer-events: none;
+}
+header::before {
+  content: '';
+  position: absolute;
+  right: 60px; bottom: -80px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.04);
+  pointer-events: none;
+}
+.header-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+.header-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--green-line);
+  margin-bottom: .5rem;
+}
+header h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: .5rem;
+}
+.header-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 1.5rem;
+}
+.header-chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+.chip {
+  font-size: 11px;
+  font-weight: 500;
+  padding: .3rem .85rem;
+  border-radius: 99px;
+  background: rgba(255,255,255,.15);
+  color: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+/* ── NAV STICKY ── */
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 8px rgba(13,92,71,.08);
+}
+.nav-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-btn {
+  padding: .85rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .18s;
+  flex-shrink: 0;
+}
+.nav-btn:hover { color: var(--green); }
+.nav-btn.active { color: var(--green); border-bottom-color: var(--green); }
+.nav-btn.nav-rules { margin-left: auto; color: var(--slate); }
+.nav-btn.nav-rules:hover { color: var(--green); }
+
+/* ── MAIN ── */
+main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+/* ── DAY SECTION ── */
+.day-section { display: none; }
+.day-section.active { display: block; }
+
+.day-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.day-header h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--green);
+  margin-bottom: .25rem;
+}
+.day-header p { font-size: 13px; color: var(--muted); }
+
+/* ── SHIFT BLOCK ── */
+.shift-block { margin-bottom: 2rem; }
+.shift-label {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  margin-bottom: 1rem;
+}
+.shift-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.shift-dot.m { background: var(--manha); }
+.shift-dot.t { background: var(--tarde); }
+.shift-dot.n { background: var(--noite); }
+.shift-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.shift-name.m { color: var(--manha); }
+.shift-name.t { color: var(--tarde); }
+.shift-name.n { color: var(--noite); }
+.shift-hours { font-size: 11px; color: var(--muted); }
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 1.75rem; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px; top: 8px; bottom: 8px;
+  width: 1.5px;
+  background: var(--border);
+}
+.tl-group { margin-bottom: 1.25rem; }
+.tl-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .5rem;
+  padding-left: .25rem;
+}
+.tl-item {
+  position: relative;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  margin-bottom: .4rem;
+  transition: border-color .18s, box-shadow .18s;
+}
+.tl-item:hover {
+  border-color: var(--green-line);
+  box-shadow: 0 2px 10px rgba(13,92,71,.08);
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--border);
+  transition: border-color .18s;
+}
+.tl-item:hover::before { border-color: var(--green); }
+.tl-top { display: flex; align-items: flex-start; gap: .65rem; flex-wrap: wrap; margin-bottom: .3rem; }
+.tl-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--green);
+  padding: 1px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tl-time.t { background: var(--tarde); }
+.tl-time.n { background: var(--noite); }
+.tl-time.any { background: var(--urg); }
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 99px;
+  letter-spacing: .03em;
+  flex-shrink: 0;
+}
+.b-tec { background: var(--tec-bg); color: var(--tec); }
+.b-enf { background: var(--enf-bg); color: var(--enf); }
+.b-pac { background: var(--pac-bg); color: var(--pac); }
+.b-urg { background: var(--urg-bg); color: var(--urg); }
+.tl-label { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; min-width: 200px; }
+.tl-note {
+  font-size: 11px;
+  color: var(--tarde);
+  margin-top: .25rem;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.tl-note.info { color: var(--manha); }
+.tl-item.urg {
+  border-color: #FCA5A5;
+  background: #FFF8F8;
+}
+.tl-item.urg::before { border-color: var(--urg); background: var(--urg-bg); }
+
+/* ── RULES SECTION ── */
+#s-regras { display: none; }
+#s-regras.active { display: block; }
+.rules-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.rules-header h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--green);
+  margin-bottom: .25rem;
+}
+.rules-header p { font-size: 13px; color: var(--muted); }
+.rules-intro {
+  background: var(--green-lt);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: .85rem 1.1rem;
+  font-size: 13px;
+  color: var(--slate);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .65rem;
+}
+@media (max-width: 580px) { .rules-grid { grid-template-columns: 1fr; } }
+.rule-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: .85rem;
+  align-items: flex-start;
+  transition: border-color .18s;
+}
+.rule-card:hover { border-color: var(--green-line); }
+.rule-card.new-rule { border-color: #A7F3D0; background: #F0FDF8; }
+.rule-num {
+  width: 26px; height: 26px;
+  min-width: 26px;
+  border-radius: 50%;
+  background: var(--green-lt);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rule-card.new-rule .rule-num { background: #A7F3D0; color: #065F46; }
+.rule-body {}
+.rule-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: .2rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+.new-tag {
+  font-size: 9px;
+  font-weight: 700;
+  background: #059669;
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 99px;
+  letter-spacing: .05em;
+}
+.rule-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── PRINT ── */
+.print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .6rem 1.25rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--slate);
+  cursor: pointer;
+  transition: all .18s;
+  margin-top: 1.5rem;
+}
+.print-btn:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: .75rem 1rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+.legend-item { display: flex; align-items: center; gap: .35rem; font-size: 12px; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+@media print {
+  nav, .print-btn { display: none !important; }
+  .day-section, #s-regras { display: block !important; }
+  .shift-block { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-label">CareFlow · Home Care</div>
+    <h1>Rotina de Cuidados</h1>
+    <div class="header-sub">AME tipo 2 · BIPAP noturno · 3 turnos 24h · Segunda a domingo</div>
+    <div class="header-chips">
+      <span class="chip">☀️ Manhã 07h30–15h</span>
+      <span class="chip">🌤 Tarde 15h–23h</span>
+      <span class="chip">🌙 Noite 23h–07h30</span>
+      <span class="chip">💊 Risdiplam 16h30</span>
+      <span class="chip">😴 BIPAP 23h</span>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showDay('seg',this)">Seg</button>
+    <button class="nav-btn" onclick="showDay('ter',this)">Ter</button>
+    <button class="nav-btn" onclick="showDay('qua',this)">Qua</button>
+    <button class="nav-btn" onclick="showDay('qui',this)">Qui</button>
+    <button class="nav-btn" onclick="showDay('sex',this)">Sex</button>
+    <button class="nav-btn" onclick="showDay('sab',this)">Sáb</button>
+    <button class="nav-btn" onclick="showDay('dom',this)">Dom</button>
+    <button class="nav-btn nav-rules" onclick="showRules(this)">📋 Regras da casa</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- LEGENDA -->
+  <div class="legend">
+    <div class="legend-item"><span class="badge b-tec">Técnico</span></div>
+    <div class="legend-item"><span class="badge b-enf">Enfermeiro / Fisio</span></div>
+    <div class="legend-item"><span class="badge b-pac">Minha participação</span></div>
+    <div class="legend-item"><span class="badge b-urg">Urgência</span></div>
+  </div>
+
+  <!-- ══════════ SEGUNDA ══════════ -->
+  <div class="day-section active" id="d-seg">
+    <div class="day-header">
+      <h2>Segunda-feira</h2>
+      <p>Início da semana · Fisioterapia às 08h30 · Dia de trabalho completo</p>
+    </div>
+    <!-- MANHÃ -->
+    <div class="shift-block">
+      <div class="shift-label">
+        <div class="shift-dot m"></div>
+        <span class="shift-name m">Manhã</span>
+        <span class="shift-hours">07h30 – 15h</span>
+      </div>
+      <div class="timeline">
+        <div class="tl-group">
+          <div class="tl-section-label">Início do turno</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">07:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir e registrar sinais vitais: FC, FR, SpO₂, PA, temperatura</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">07:35</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Retirar máscara do BIPAP com cuidado — verificar marcas de pressão no rosto e nariz. Higienizar máscara e guardar em local seco</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">07:40</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral completa — escovação e enxague antisséptico</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Café da manhã</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">07:45</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Posicionar cabeceira 45° · levar alimentos à boca respeitando meu ritmo</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">07:45</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Mastigar e engolir no meu tempo — avisar se tiver dificuldade ou engasgo</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">08:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Preparar transferência para a cadeira de rodas — posicionar para trabalho</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Fisioterapia</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">08:30</span><span class="badge b-enf">Fisioterapeuta</span></div><div class="tl-label">Sessão de fisioterapia — 40 minutos. Técnico permanece disponível mas não interfere durante a sessão</div><div class="tl-note info">🦽 Em fisioterapia — não interromper</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">09:10</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar: exercícios realizados, tolerância e intercorrências durante a fisioterapia</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Trabalho</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">10:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Verificar postura na cadeira de rodas — reposicionamento discreto se necessário</div><div class="tl-note">💼 Em atividade profissional — não interromper sem necessidade</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">10:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir SpO₂ e registrar — de forma discreta, sem interromper o trabalho</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">11:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Administrar sulfato ferroso — 30 min antes do almoço. Oferecer com suco de laranja. Registrar horário</div><div class="tl-note">⚠️ Não oferecer com leite ou café</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Almoço</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">12:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 1º copo da tarde (sequência de hora em hora)</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">12:15</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Verificar posição — cabeceira ou postura na cadeira adequada para refeição</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">12:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Almoço — levar alimentos à boca, respeitar meu ritmo. Não apressar</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">12:20</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Mastigar e engolir no meu ritmo — avisar engasgos ou dificuldades</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">13:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral pós-almoço · Aferir sinais vitais — 2ª aferição do turno</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">13:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 2º copo da tarde</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">14:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 3º copo da tarde</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time">14:45</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar evolução do turno da manhã e preparar passagem de plantão</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- TARDE -->
+    <div class="shift-block">
+      <div class="shift-label">
+        <div class="shift-dot t"></div>
+        <span class="shift-name t">Tarde</span>
+        <span class="shift-hours">15h – 23h</span>
+      </div>
+      <div class="timeline">
+        <div class="tl-group">
+          <div class="tl-section-label">Passagem de plantão</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Receber informações do turno da manhã: sinais vitais, alimentação, posições, intercorrências</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:05</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Informar como me sinto: cansaço, dor, disposição respiratória</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Trabalho e hidratação</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 4º copo da tarde</div><div class="tl-note">💼 Em atividade profissional até 18h20</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Lanche da tarde — oferecer sem interromper trabalho</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir sinais vitais — registrar · Oferecer água — 5º copo</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Administrar risdiplam — diluído conforme orientação médica. Registrar horário e lote. Não atrasar esta dose</div><div class="tl-note">⚠️ Dose crítica — não atrasar</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 6º copo da tarde</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 7º copo · Preparar banheiro e cadeira de banho</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Banho no banheiro</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Preparar banheiro: água aquecida, cadeira de banho posicionada, toalha, roupa limpa — tudo pronto antes de transferir</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:25</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Transferência da cadeira de rodas para a cadeira de banho com segurança</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Banho completo no banheiro — respeitar privacidade, temperatura confortável, sem pressa</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:30</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Informar se água estiver quente/fria demais ou qualquer desconforto</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Inspeção completa da pele durante secagem — sacro, calcâneos, maléolos, joelhos, occipital. Registrar qualquer alteração e fotografar se necessário</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:55</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Hidratante nas proeminências · vestir roupa limpa · transferência de volta à cadeira ou cama</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">19:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aproveitar que estou fora da cama: trocar toda a roupa de cama agora</div></div>
+        </div>
+        <div class="tl-group">
+          <div class="tl-section-label">Jantar e noite</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">19:25</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Posicionar para refeição — cabeceira 45° se na cama, ou postura adequada na cadeira</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">19:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Jantar — levar alimentos à boca no meu ritmo. Oferecer água durante a refeição</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">20:15</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral pós-jantar · Aferir sinais vitais — 2ª aferição do turno</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">20:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Transferência para a cama · posicionamento com coxins de apoio</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">21:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar posição · verificar calcâneos flutuantes e coxins</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">22:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Posicionamento final para dormir — decúbito preferido, coxins, cabeceira adequada</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">23:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Conectar BIPAP — ajustar máscara sem pressão excessiva, verificar ausência de vazamento</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">23:00</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Avisar se máscara estiver desconfortável ou com vazamento — não tolerar em silêncio</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">23:10</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Confirmar SpO₂ estável após início do BIPAP — registrar evolução e preparar passagem</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- NOITE -->
+    <div class="shift-block">
+      <div class="shift-label">
+        <div class="shift-dot n"></div>
+        <span class="shift-name n">Noite</span>
+        <span class="shift-hours">23h – 07h30</span>
+      </div>
+      <div class="timeline">
+        <div class="tl-group">
+          <div class="tl-section-label">Passagem e monitoramento</div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">23:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Receber passagem: BIPAP conectado, SpO₂, posição, intercorrências do turno da tarde</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">00:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir SpO₂ e FR — registrar sem acordar se dormindo bem</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">01:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito com cuidado para não deslocar máscara do BIPAP — registrar posição</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">03:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito + verificar ajuste e vedação da máscara</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">04:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir sinais vitais completos — registrar</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">05:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">06:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar evolução: sono, SpO₂ mínima da noite, posições usadas, funcionamento do BIPAP, intercorrências</div></div>
+          <div class="tl-item urg"><div class="tl-top"><span class="tl-time any">qualquer hora</span><span class="badge b-urg">Urgência</span></div><div class="tl-label">SpO₂ &lt; 92% ou alarme do BIPAP → verificar máscara imediatamente. Se não resolver em 2 min → acionar médico</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TERÇA a DOMINGO — copiam a mesma estrutura base ══════════ -->
+  <!-- Para dias sem fisioterapia (Ter, Qui, Sáb, Dom) o bloco manhã é levemente diferente -->
+
+  <script>
+  // Gera os dias Terça a Domingo dinamicamente a partir do template
+  const diasSemFisio = [
+    {id:'ter', label:'Terça-feira',   desc:'Dia de trabalho completo'},
+    {id:'qua', label:'Quarta-feira',  desc:'Fisioterapia às 08h30'},
+    {id:'qui', label:'Quinta-feira',  desc:'Dia de trabalho completo'},
+    {id:'sex', label:'Sexta-feira',   desc:'Dia de trabalho completo'},
+    {id:'sab', label:'Sábado',        desc:'Sem trabalho · rotina de descanso'},
+    {id:'dom', label:'Domingo',       desc:'Sem trabalho · rotina de descanso'},
+  ];
+
+  const hasFisio = ['qua']; // Quarta também tem fisio
+  const hasWork  = ['ter','qua','qui','sex'];
+
+  diasSemFisio.forEach(dia => {
+    const fisio = hasFisio.includes(dia.id);
+    const work  = hasWork.includes(dia.id);
+
+    const manha_extra = fisio ? `
+      <div class="tl-group">
+        <div class="tl-section-label">Fisioterapia</div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">08:30</span><span class="badge b-enf">Fisioterapeuta</span></div><div class="tl-label">Sessão de fisioterapia — 40 minutos</div><div class="tl-note info">🦽 Em fisioterapia — não interromper</div></div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">09:10</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar exercícios, tolerância e intercorrências</div></div>
+      </div>` : '';
+
+    const work_block = work ? `
+      <div class="tl-group">
+        <div class="tl-section-label">Trabalho</div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">${fisio ? '09:10' : '08:30'}</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Verificar postura na cadeira de rodas — reposicionamento discreto</div><div class="tl-note">💼 Em atividade profissional até 18h20 — não interromper sem necessidade</div></div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">10:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir SpO₂ e registrar — discretamente</div></div>
+      </div>` : `
+      <div class="tl-group">
+        <div class="tl-section-label">Manhã livre</div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">09:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Verificar postura · mudança de decúbito · registrar posição</div></div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">10:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir SpO₂ e sinais vitais — registrar</div></div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">10:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Exercícios passivos de amplitude de movimento — MMSS e MMII, lentamente</div></div>
+        <div class="tl-item"><div class="tl-top"><span class="tl-time">11:00</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Tempo de lazer, leitura ou descanso — informar preferências ao técnico</div></div>
+      </div>`;
+
+    const html = `
+    <div class="day-section" id="d-${dia.id}">
+      <div class="day-header">
+        <h2>${dia.label}</h2>
+        <p>${dia.desc}</p>
+      </div>
+      <div class="shift-block">
+        <div class="shift-label">
+          <div class="shift-dot m"></div>
+          <span class="shift-name m">Manhã</span>
+          <span class="shift-hours">07h30 – 15h</span>
+        </div>
+        <div class="timeline">
+          <div class="tl-group">
+            <div class="tl-section-label">Início do turno</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">07:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir e registrar sinais vitais: FC, FR, SpO₂, PA, temperatura</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">07:35</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Retirar máscara do BIPAP com cuidado · higienizar e guardar em local seco</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">07:40</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral completa — escovação e enxague antisséptico</div></div>
+          </div>
+          <div class="tl-group">
+            <div class="tl-section-label">Café da manhã</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">07:45</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Posicionar cabeceira 45° · levar alimentos à boca respeitando meu ritmo</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">07:45</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Mastigar e engolir no meu tempo — avisar dificuldades ou engasgos</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">08:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Preparar transferência para a cadeira de rodas</div></div>
+          </div>
+          ${manha_extra}
+          ${work_block}
+          <div class="tl-group">
+            <div class="tl-section-label">Medicação e almoço</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">11:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Administrar sulfato ferroso com suco de laranja — 30 min antes do almoço</div><div class="tl-note">⚠️ Não oferecer com leite ou café</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">12:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 1º copo da tarde</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">12:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Almoço — levar alimentos à boca, respeitar meu ritmo. Não apressar</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">13:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral pós-almoço · 2ª aferição de sinais vitais · oferecer água 2º copo</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">14:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 3º copo</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time">14:45</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar evolução do turno e preparar passagem de plantão</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="shift-block">
+        <div class="shift-label">
+          <div class="shift-dot t"></div>
+          <span class="shift-name t">Tarde</span>
+          <span class="shift-hours">15h – 23h</span>
+        </div>
+        <div class="timeline">
+          <div class="tl-group">
+            <div class="tl-section-label">Passagem</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Receber informações do turno da manhã</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:05</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Informar como me sinto: cansaço, dor, disposição respiratória</div></div>
+          </div>
+          <div class="tl-group">
+            <div class="tl-section-label">Tarde e hidratação</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 4º copo</div>${work ? '<div class="tl-note">💼 Em atividade profissional até 18h20</div>' : ''}</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Lanche da tarde</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir sinais vitais · oferecer água — 5º copo</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Administrar risdiplam — diluído conforme orientação. Registrar horário e lote</div><div class="tl-note">⚠️ Dose crítica — não atrasar</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 6º copo</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 7º copo · preparar banheiro e cadeira de banho</div></div>
+          </div>
+          <div class="tl-group">
+            <div class="tl-section-label">Banho</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Preparar banheiro completo antes de transferir</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:25</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Transferência para cadeira de banho com segurança</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Banho completo no banheiro — privacidade, temperatura confortável, sem pressa</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Inspeção da pele durante secagem — sacro, calcâneos, maléolos, joelhos, occipital</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:55</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Hidratante nas proeminências · vestir roupa limpa · retornar à cadeira ou cama</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">19:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Trocar roupa de cama enquanto estou fora da cama</div></div>
+          </div>
+          <div class="tl-group">
+            <div class="tl-section-label">Jantar e BIPAP</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">19:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Jantar — levar à boca no meu ritmo · oferecer água durante a refeição</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">20:15</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral pós-jantar · 2ª aferição de sinais vitais</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">20:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Transferência para cama · posicionamento com coxins</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">21:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar posição</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">22:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Posicionamento final para dormir — decúbito preferido, coxins, cabeceira</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">23:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Conectar BIPAP — ajustar máscara, verificar vedação e ausência de vazamento</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">23:10</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Confirmar SpO₂ estável após BIPAP · registrar evolução · preparar passagem</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="shift-block">
+        <div class="shift-label">
+          <div class="shift-dot n"></div>
+          <span class="shift-name n">Noite</span>
+          <span class="shift-hours">23h – 07h30</span>
+        </div>
+        <div class="timeline">
+          <div class="tl-group">
+            <div class="tl-section-label">Monitoramento</div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">23:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Receber passagem · confirmar BIPAP funcionando e SpO₂ estável</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">00:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir SpO₂ e FR — registrar sem acordar se dormindo bem</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">01:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — cuidado para não deslocar máscara · registrar posição</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">03:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito + verificar vedação da máscara</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">04:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir sinais vitais completos — registrar</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">05:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time n">06:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar evolução: sono, SpO₂ mínima, posições usadas, BIPAP, intercorrências</div></div>
+            <div class="tl-item urg"><div class="tl-top"><span class="tl-time any">qualquer hora</span><span class="badge b-urg">Urgência</span></div><div class="tl-label">SpO₂ &lt; 92% ou alarme BIPAP → verificar máscara imediatamente. Sem melhora em 2 min → acionar médico</div></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    document.querySelector('main').insertAdjacentHTML('beforeend', html);
+  });
+  </script>
+
+  <!-- ══════════ REGRAS DA CASA ══════════ -->
+  <div id="s-regras">
+    <div class="rules-header">
+      <h2>Regras da casa</h2>
+      <p>Válido para todos os técnicos e auxiliares de enfermagem · plantão 12h</p>
+    </div>
+    <div class="rules-intro">
+      Estas regras devem ser lidas e seguidas por todos os profissionais a partir do primeiro dia de plantão. Este é o lar do paciente — o respeito ao ambiente e à privacidade é parte do cuidado. Dúvidas, falar diretamente com o paciente ou familiar responsável.
+    </div>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="rule-num">1</div>
+        <div class="rule-body">
+          <div class="rule-title">Troca de calçado obrigatória</div>
+          <div class="rule-desc">Sapatilha descartável ou chinelo exclusivo ao entrar. Calçado da rua fica na entrada — nunca entrar no quarto com sapato de rua.</div>
+        </div>
+      </div>
+      <div class="rule-card new-rule">
+        <div class="rule-num">2</div>
+        <div class="rule-body">
+          <div class="rule-title">Trocar de roupa ao iniciar o plantão <span class="new-tag">NOVO</span></div>
+          <div class="rule-desc">Trocar a roupa da rua por uniforme limpo antes de entrar no quarto. Roupa de rua pode carregar agentes contaminantes — crítico para AME tipo 2 com risco respiratório.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">3</div>
+        <div class="rule-body">
+          <div class="rule-title">Higiene das mãos</div>
+          <div class="rule-desc">Álcool gel 70% obrigatório ao entrar, antes e após cada procedimento, após usar o banheiro e após refeições.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">4</div>
+        <div class="rule-body">
+          <div class="rule-title">Descarte de lixo correto</div>
+          <div class="rule-desc">Luvas, máscaras e materiais com contato corporal → saco branco infectante. Agulhas e perfurocortantes → Descartex rígido. Nunca misturar com lixo comum.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">5</div>
+        <div class="rule-body">
+          <div class="rule-title">Celular em modo silencioso</div>
+          <div class="rule-desc">No quarto do paciente o celular deve estar em vibrar. Ligações pessoais longas fora do quarto e fora do horário de procedimentos.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">6</div>
+        <div class="rule-body">
+          <div class="rule-title">Visitas não são permitidas</div>
+          <div class="rule-desc">O técnico não pode receber visitas pessoais durante o plantão em nenhuma circunstância.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">7</div>
+        <div class="rule-body">
+          <div class="rule-title">Descanso supervisionado</div>
+          <div class="rule-desc">O descanso de 1h pode ser feito na poltrona do quarto, mas o monitor e oxímetro devem estar sempre audíveis. Nunca sair do quarto durante o descanso.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">8</div>
+        <div class="rule-body">
+          <div class="rule-title">Cozinha com responsabilidade</div>
+          <div class="rule-desc">Lavar e guardar tudo que usar. Marmita identificada na geladeira. Não consumir alimentos do paciente ou da família sem permissão.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">9</div>
+        <div class="rule-body">
+          <div class="rule-title">Passagem de plantão presencial</div>
+          <div class="rule-desc">O técnico só pode sair após o próximo chegar e receber as informações do turno — nunca deixar o paciente sem cobertura.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">10</div>
+        <div class="rule-body">
+          <div class="rule-title">Confidencialidade</div>
+          <div class="rule-desc">Fotos, vídeos e informações sobre o paciente, sua saúde e sua casa são estritamente confidenciais. Proibido compartilhar em redes sociais ou com terceiros.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">11</div>
+        <div class="rule-body">
+          <div class="rule-title">Doença: avisar com antecedência</div>
+          <div class="rule-desc">Sintomas gripais, febre ou qualquer sinal de infecção → avisar a empresa com antecedência para substituição. Nunca vir trabalhar doente.</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">12</div>
+        <div class="rule-body">
+          <div class="rule-title">Respeito mútuo e silêncio noturno</div>
+          <div class="rule-desc">Este é o lar do paciente. Barulho e conversas altas não são permitidos após as 22h. Tratar o paciente com dignidade e paciência em todos os momentos.</div>
+        </div>
+      </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir regras</button>
+  </div>
+
+</main>
+
+<footer>
+  CareFlow · Home Care · AME tipo 2 · Documento gerado para uso interno
+</footer>
+
+<script>
+function showDay(id, btn) {
+  document.querySelectorAll('.day-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-regras').classList.remove('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('d-' + id);
+  if (el) el.classList.add('active');
+  btn.classList.add('active');
+}
+
+function showRules(btn) {
+  document.querySelectorAll('.day-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-regras').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>
