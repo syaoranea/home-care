@@ -509,7 +509,7 @@ footer {
       <div class="timeline">
         <div class="tl-group">
           <div class="tl-section-label">Passagem de plantão</div>
-          <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 3º copo da tarde (sequência de hora em hora)</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 4º copo da tarde (sequência de hora em hora)</div></div>
           <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:05</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Informar como me sinto: cansaço, dor, disposição respiratória</div></div>
         </div>
         <div class="tl-group">
@@ -517,7 +517,7 @@ footer {
           <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Lanche da tarde — oferecer sem interromper trabalho</div></div>
           <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:00</span><span class="badge b-enf">Enfermeiro</span></div><div class="tl-label">Passagem da sonda de alívio</div></div>
           <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Administrar risdiplam — diluído conforme orientação médica. Registrar horário e lote. Não atrasar esta dose</div><div class="tl-note">⚠️ Dose crítica — não atrasar</div></div>
-          <div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 6º copo da tarde</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-enf">Fisioterapeuta</span></div><div class="tl-label">Sessão de fisioterapia — 40 minutos. Técnico permanece disponível mas não interfere durante a sessão</div></div>
           <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 7º copo · Preparar banheiro e cadeira de banho</div></div>
         </div>
         <div class="tl-group">
@@ -582,8 +582,9 @@ footer {
     {id:'dom', label:'Domingo',       desc:'Sem trabalho · rotina de descanso'},
   ];
 
-  const hasFisio = ['qua']; // Quarta também tem fisio
-  const hasWork  = ['ter','qua','qui','sex'];
+  const hasFisio      = ['qua']; // Quarta também tem fisio manhã
+  const hasFisioTarde = ['qua','sex']; // Quarta e Sexta têm fisio às 17h
+  const hasWork       = ['ter','qua','qui','sex'];
 
   diasSemFisio.forEach(dia => {
     const fisio = hasFisio.includes(dia.id);
@@ -658,7 +659,7 @@ footer {
         <div class="timeline">
           <div class="tl-group">
             <div class="tl-section-label">Passagem</div>
-            <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 3º copo da tarde (sequência de hora em hora)</div></div>
+            <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 4º copo da tarde (sequência de hora em hora)</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:05</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Informar como me sinto: cansaço, dor, disposição respiratória</div></div>
           </div>
           <div class="tl-group">
@@ -666,7 +667,10 @@ footer {
             <div class="tl-item"><div class="tl-top"><span class="tl-time t">15:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Lanche da tarde</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:00</span><span class="badge b-enf">Enfermeiro</span></div><div class="tl-label">Passagem da sonda de alívio</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time t">16:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Administrar risdiplam — diluído conforme orientação. Registrar horário e lote</div><div class="tl-note">⚠️ Dose crítica — não atrasar</div></div>
-            <div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 6º copo</div></div>
+            ${hasFisioTarde.includes(dia.id)
+              ? `<div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-enf">Fisioterapeuta</span></div><div class="tl-label">Sessão de fisioterapia — 40 minutos. Técnico permanece disponível mas não interfere durante a sessão</div></div>`
+              : `<div class="tl-item"><div class="tl-top"><span class="tl-time t">17:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 6º copo da tarde</div></div>`
+            }
             <div class="tl-item"><div class="tl-top"><span class="tl-time t">18:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 7º copo · preparar banheiro e cadeira de banho</div></div>
           </div>
           <div class="tl-group">
