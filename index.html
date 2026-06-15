@@ -336,6 +336,12 @@ main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem; }
   flex-shrink: 0;
 }
 .rule-card.new-rule .rule-num { background: #A7F3D0; color: #065F46; }
+.rule-card.warn { border-color: #FCD34D; background: #FFFBEB; }
+.rule-card.warn .rule-num { background: #FEF08A; color: #92400E; }
+.rule-card.warn .rule-title { color: #92400E; }
+.rule-card.danger { border-color: #FCA5A5; background: #FFF5F5; }
+.rule-card.danger .rule-num { background: #FEE2E2; color: #991B1B; }
+.rule-card.danger .rule-title { color: #991B1B; }
 .rule-body {}
 .rule-title {
   font-size: 13px;
@@ -551,8 +557,8 @@ footer {
         <div class="tl-group">
           <div class="tl-section-label">Passagem e monitoramento</div>
           <div class="tl-item"><div class="tl-top"><span class="tl-time n">01:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito com cuidado para não deslocar máscara do BIPAP — registrar posição</div></div>
-          <div class="tl-item"><div class="tl-top"><span class="tl-time n">03:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito + verificar ajuste e vedação da máscara</div></div>
-          <div class="tl-item"><div class="tl-top"><span class="tl-time n">05:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">03:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito + verificar ajuste e vedação da máscara — registrar posição</div></div>
+          <div class="tl-item"><div class="tl-top"><span class="tl-time n">05:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar posição</div></div>
           <div class="tl-item"><div class="tl-top"><span class="tl-time n">06:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar evolução: sono, SpO₂ mínima da noite, posições usadas, funcionamento do BIPAP, intercorrências</div></div>
           <div class="tl-item urg"><div class="tl-top"><span class="tl-time any">qualquer hora</span><span class="badge b-urg">Urgência</span></div><div class="tl-label">SpO₂ &lt; 92% ou alarme do BIPAP → verificar máscara imediatamente. Se não resolver em 2 min → acionar família</div></div>
         </div>
@@ -694,7 +700,7 @@ footer {
             <div class="tl-section-label">Monitoramento</div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time n">01:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — cuidado para não deslocar máscara · registrar posição</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time n">03:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito + verificar vedação da máscara</div></div>
-              <div class="tl-item"><div class="tl-top"><span class="tl-time n">05:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar</div></div>
+              <div class="tl-item"><div class="tl-top"><span class="tl-time n">05:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Mudança de decúbito — registrar posição</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time n">06:50</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Registrar evolução: sono, SpO₂ mínima, posições usadas, BIPAP, intercorrências</div></div>
             <div class="tl-item urg"><div class="tl-top"><span class="tl-time any">qualquer hora</span><span class="badge b-urg">Urgência</span></div><div class="tl-label">SpO₂ &lt; 92% ou alarme BIPAP → verificar máscara imediatamente. Sem melhora em 2 min → acionar família</div></div>
           </div>
@@ -730,7 +736,7 @@ footer {
           <div class="rule-desc">Trocar a roupa da rua por uniforme limpo antes de entrar no quarto. Roupa de rua pode carregar agentes contaminantes — crítico para AME tipo 2 com risco respiratório.</div>
         </div>
       </div>
-      <div class="rule-card">
+      <div class="rule-card warn">
         <div class="rule-num">3</div>
         <div class="rule-body">
           <div class="rule-title">Higiene das mãos</div>
@@ -761,40 +767,33 @@ footer {
       <div class="rule-card">
         <div class="rule-num">7</div>
         <div class="rule-body">
-          <div class="rule-title">Descanso supervisionado</div>
-          <div class="rule-desc">O descanso de 1h pode ser feito na poltrona do quarto, mas o monitor e oxímetro devem estar sempre audíveis. Nunca sair do quarto durante o descanso.</div>
-        </div>
-      </div>
-      <div class="rule-card">
-        <div class="rule-num">8</div>
-        <div class="rule-body">
           <div class="rule-title">Cozinha com responsabilidade</div>
           <div class="rule-desc">Lavar e guardar tudo que usar. Marmita identificada na geladeira. Não consumir alimentos do paciente ou da família sem permissão.</div>
         </div>
       </div>
       <div class="rule-card">
-        <div class="rule-num">9</div>
+        <div class="rule-num">8</div>
         <div class="rule-body">
           <div class="rule-title">Passagem de plantão presencial</div>
           <div class="rule-desc">O técnico só pode sair após o próximo chegar e receber as informações do turno — nunca deixar o paciente sem cobertura.</div>
         </div>
       </div>
       <div class="rule-card">
-        <div class="rule-num">10</div>
+        <div class="rule-num">9</div>
         <div class="rule-body">
           <div class="rule-title">Confidencialidade</div>
           <div class="rule-desc">Fotos, vídeos e informações sobre o paciente, sua saúde e sua casa são estritamente confidenciais. Proibido compartilhar em redes sociais ou com terceiros.</div>
         </div>
       </div>
-      <div class="rule-card">
-        <div class="rule-num">11</div>
+      <div class="rule-card danger">
+        <div class="rule-num">10</div>
         <div class="rule-body">
           <div class="rule-title">Doença: avisar com antecedência</div>
           <div class="rule-desc">Sintomas gripais, febre ou qualquer sinal de infecção → avisar a empresa com antecedência para substituição. Nunca vir trabalhar doente.</div>
         </div>
       </div>
       <div class="rule-card">
-        <div class="rule-num">12</div>
+        <div class="rule-num">11</div>
         <div class="rule-body">
           <div class="rule-title">Respeito mútuo e silêncio noturno</div>
           <div class="rule-desc">Este é o lar do paciente. Barulho e conversas altas não são permitidos após as 22h. Tratar o paciente com dignidade e paciência em todos os momentos.</div>
