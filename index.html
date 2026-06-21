@@ -592,7 +592,8 @@ footer {
       </div>` : `
       <div class="tl-group">
         <div class="tl-section-label">Manhã livre</div>
-        <div class="tl-item"><div class="tl-top"><span class="tl-time">09:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Verificar postura · mudança de decúbito · registrar posição</div></div>
+        ${dia.id !== 'dom' ? `<div class="tl-item"><div class="tl-top"><span class="tl-time">09:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Verificar postura · mudança de decúbito · registrar posição</div></div>` : ''}
+        ${dia.id === 'dom' ? `<div class="tl-item"><div class="tl-top"><span class="tl-time">09:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Tomar vitaminas: Ômega 3, Coenzima Q10, L-Carnitina, Metilcobalamina</div></div>` : ''}
         <div class="tl-item"><div class="tl-top"><span class="tl-time">11:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Aferir SpO₂ e sinais vitais — registrar</div></div>
         <div class="tl-item"><div class="tl-top"><span class="tl-time">10:30</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Exercícios passivos de amplitude de movimento — MMSS e MMII, lentamente</div></div>
         <div class="tl-item"><div class="tl-top"><span class="tl-time">11:00</span><span class="badge b-pac">Minha participação</span></div><div class="tl-label">Tempo de lazer, leitura ou descanso — informar preferências ao técnico</div></div>
@@ -632,6 +633,7 @@ footer {
             <div class="tl-item"><div class="tl-top"><span class="tl-time">12:00</span><span class="badge b-enf">Enfermeiro</span></div><div class="tl-label">Passagem da sonda de alívio</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time">12:15</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 1º copo da tarde (sequência de hora em hora)</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time">12:20</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Almoço — levar alimentos à boca, respeitar meu ritmo. Não apressar</div></div>
+            ${dia.id === 'dom' ? `<div class="tl-item"><div class="tl-top"><span class="tl-time">12:40</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 2º copo da tarde (sequência de hora em hora)</div></div>` : ''}
             <div class="tl-item"><div class="tl-top"><span class="tl-time">13:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Higiene oral pós-almoço · 2ª aferição de sinais vitais · oferecer água 2º copo</div></div>
             <div class="tl-item"><div class="tl-top"><span class="tl-time">14:00</span><span class="badge b-tec">Técnico</span></div><div class="tl-label">Oferecer água — 3º copo</div></div>
           </div>
